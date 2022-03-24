@@ -6,12 +6,12 @@
     }
 
     require_once "sql/db_credentials.php";
-    $login = $password = "";
-    $username_err = $password_err = $login_err = "";
+    $email = $password = "";
+    $email_err = $password_err = $login_err = "";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(empty(trim($_POST["email"]))){
-            $username_err = "Please enter username.";
+            $email_err = "Please enter e-mail.";
         } else{
             $email = trim($_POST["email"]);
         }
@@ -21,6 +21,46 @@
         } else{
             $password = trim($_POST["password"]);
         }
+
+        if(empty($email_err) && empty($password_err)){
+            $sql = "SELECT accountID, email, password FROM account WHERE email = :email";
+
+            if($stmt = $pdo->prepare($sql)){
+
+                $stmt->bindParam(":email", $param_email, PDO::PARAM_STR);
+                $param_email = trim($_POST["email"]);
+
+                if($stmt->execute()) {
+                    if($stmt->rowCount() == 1){
+                        if($row = $stmt->fetch()){
+                            $accountID = $row["accountID"];
+                            $username = $row["username"];
+                            $hashed_password = $row["password"];
+                            if($password == $hashed_password){
+                                session_start();
+
+                                $_SESSION["loggedin"] = true;
+                                $_SESSION["accountID"] = $accountID;
+                                $_SESSION["username"] = $username;
+
+                                header("location: dashboard.php");
+                            } else{
+                                $login_err = "Invalid username or password.";
+                            }
+                        }
+                    } else{
+                        // Username doesn't exist, display a generic error message
+                        $login_err = "Invalid username or password.";
+                    }
+                } else{
+                    echo "Oops! Something went wrong. Please try again later.";
+                }
+
+                // Close statement
+                unset($stmt);
+            }
+        }
+        unset($pdo);
     }
 ?>
 
@@ -45,12 +85,12 @@
 
                 <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="p-4 p-md-5 border rounded-3 bg-light">
                     <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email">
+                        <input type="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" id="floatingInput" placeholder="name@example.com" name="email">
                         <label for="floatingInput">Email address</label>
-                        <span class="invalid-feedback"><?php echo $login_err; ?></span>
+                        <span class="invalid-feedback"><?php echo $email_err; ?></span>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+                        <input type="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>" id="floatingPassword" placeholder="Password" name="password">
                         <label for="floatingPassword">Password</label>
                         <span class="invalid-feedback"><?php echo $password_err; ?></span>
                     </div>
