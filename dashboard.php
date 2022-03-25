@@ -9,6 +9,6 @@
 </head>
 <body>
     <?= "siemson" ?>
-
+    <a href="logout.php""><button>Log out!</button></a>
 </body>
 </html>

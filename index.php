@@ -23,7 +23,7 @@
         }
 
         if(empty($email_err) && empty($password_err)){
-            $sql = "SELECT accountID, email, password FROM account WHERE email = :email";
+            $sql = "SELECT accountID, username, email, password FROM account WHERE email = :email";
 
             if($stmt = $pdo->prepare($sql)){
 
@@ -75,10 +75,12 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body>
+
+
     <div class="container col-xl-10 col-xxl-8 px-4 py-5">
         <div class="row align-items-center g-lg-5 py-5">
             <div class="col-lg-7 text-center text-lg-start">
-                <h1 class="display-4 fw-bold lh-1 mb-3">Vertically centered hero sign-up form</h1>
+                <h1 class="display-4 fw-bold lh-1 mb-3">BeUpToDate</h1>
                 <p class="col-lg-10 fs-4">Below is an example form built entirely with Bootstrap’s form controls. Each required form group has a validation state that can be triggered by attempting to submit the form without completing it.</p>
             </div>
             <div class="col-md-10 mx-auto col-lg-5">
@@ -87,13 +89,20 @@
                     <div class="form-floating mb-3">
                         <input type="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" id="floatingInput" placeholder="name@example.com" name="email">
                         <label for="floatingInput">Email address</label>
-                        <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                        <div class="invalid-feedback"><?= $email_err; ?></div>
                     </div>
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>" id="floatingPassword" placeholder="Password" name="password">
                         <label for="floatingPassword">Password</label>
-                        <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                        <div class="invalid-feedback"><?= $password_err; ?></div>
                     </div>
+
+                    <?php
+                    if(!empty($login_err)){
+                        echo '<div class="alert alert-danger">' . $login_err . '</div>';
+                    }
+                    ?>
+
                     <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
                     <hr class="my-4">
                     <small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>
