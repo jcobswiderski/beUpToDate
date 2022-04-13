@@ -1,3 +1,12 @@
+<?php
+    session_start();
+    if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+        header("location: index.php");
+        exit;
+        }
+    require_once "sql/db_credentials.php";
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,7 +17,18 @@
     <title>Document</title>
 </head>
 <body>
-    <?= "siemson" ?>
+    <?php
+        $sql = $pdo->prepare("SELECT * FROM note WHERE authorID = ?");
+        $sql->execute([ $_SESSION['accountID']]);
+        $notes = $sql->fetchAll();
+
+        foreach ($notes as $note) {
+            echo $note['title'] . "<br>";
+
+        }
+    ?>
+
+
     <a href="logout.php""><button>Log out!</button></a>
 </body>
 </html>
